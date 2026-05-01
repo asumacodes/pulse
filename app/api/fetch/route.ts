@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/supabase";
 import { fetchRss } from "@/lib/sources/rss";
+import { fetchGithubReleases } from "@/lib/sources/github";
+import { fetchHn } from "@/lib/sources/hn";
 import type { FeedItem } from "@/types/feed-item";
 
 // POST /api/fetch
@@ -97,16 +99,27 @@ export async function POST(req: NextRequest) {
           sourceName: source.name,
           url: source.url,
         });
-      } else {
-        // Day 2: github_release, hn, show_hn
-        results.push({
-          source: source.name,
-          fetched: 0,
-          inserted: 0,
-          error: `type ${source.type} not implemented yet`,
+      } else if (source.type === "github_release") {
+        if (!source.url)
+          throw new Error("github_release source missing repository");
+        // repo stored in `url` field
+        items = await fetchGithubReleases({
+          sourceId: source.id,
+          sourceName: source.name,
+          repo: source.url!, // e.g. "vercel/next.js"
         });
-        continue;
+      } else if (source.type === "hn" || source.type === "show_hn") {
+        items = await fetchHn({
+          sourceId: source.id,
+          sourceName: source.name,
+          showHn: source.type === "show_hn",
+        });
+      } else {
+        throw new Error(`type ${source.type} not implemented yet`);
       }
+
+      const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      items = items.filter((item) => item.publishedAt >= cutoff);
 
       totalFetched += items.length;
 
@@ -143,10 +156,20 @@ export async function POST(req: NextRequest) {
       });
 
       // Update source health
-      await supabase
-        .from("sources")
-        .update({ last_fetch: new Date().toISOString(), fetch_error: null })
-        .eq("id", source.id);
+      if (items.length === 0) {
+        results.push({
+          source: source.name,
+          fetched: 0,
+          inserted: 0,
+        });
+
+        await supabase
+          .from("sources")
+          .update({ last_fetch: new Date().toISOString(), fetch_error: null })
+          .eq("id", source.id);
+
+        continue;
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       results.push({

@@ -168,22 +168,22 @@ insert into sources (name, type, url, category, tier, enabled) values
   ('Interconnects',     'rss', 'https://www.interconnects.ai/feed',          'builders', 'B', true),
 
   -- GitHub Releases (Tier A) — url is the "owner/repo" identifier
-  ('vercel/next.js',                'github_release', 'vercel/next.js',                'frontend',    'A', false),
-  ('vercel/ai',                     'github_release', 'vercel/ai',                     'ai-tooling',  'A', false),
-  ('shadcn-ui/ui',                  'github_release', 'shadcn-ui/ui',                  'frontend',    'A', false),
-  ('tailwindlabs/tailwindcss',      'github_release', 'tailwindlabs/tailwindcss',      'frontend',    'A', false),
-  ('supabase/supabase',             'github_release', 'supabase/supabase',             'backend',     'A', false),
-  ('radix-ui/primitives',           'github_release', 'radix-ui/primitives',           'frontend',    'A', false),
-  ('emilkowalski/vaul',             'github_release', 'emilkowalski/vaul',             'frontend',    'A', false),
-  ('anthropics/anthropic-sdk-typescript', 'github_release', 'anthropics/anthropic-sdk-typescript', 'ai-tooling', 'A', false),
-  ('anthropics/anthropic-cookbook', 'github_release', 'anthropics/anthropic-cookbook', 'ai-tooling',  'A', false),
-  ('modelcontextprotocol/servers',  'github_release', 'modelcontextprotocol/servers',  'ai-tooling',  'A', false),
-  ('ollama/ollama',                 'github_release', 'ollama/ollama',                 'local-llm',   'A', false),
-  ('ggerganov/llama.cpp',           'github_release', 'ggerganov/llama.cpp',           'local-llm',   'A', false),
+  ('vercel/next.js',                'github_release', 'vercel/next.js',                'frontend',    'A', true),
+  ('vercel/ai',                     'github_release', 'vercel/ai',                     'ai-tooling',  'A', true),
+  ('shadcn-ui/ui',                  'github_release', 'shadcn-ui/ui',                  'frontend',    'A', true),
+  ('tailwindlabs/tailwindcss',      'github_release', 'tailwindlabs/tailwindcss',      'frontend',    'A', true),
+  ('supabase/supabase',             'github_release', 'supabase/supabase',             'backend',     'A', true),
+  ('radix-ui/primitives',           'github_release', 'radix-ui/primitives',           'frontend',    'A', true),
+  ('emilkowalski/vaul',             'github_release', 'emilkowalski/vaul',             'frontend',    'A', true),
+  ('anthropics/anthropic-sdk-typescript', 'github_release', 'anthropics/anthropic-sdk-typescript', 'ai-tooling', 'A', true),
+  ('anthropics/anthropic-cookbook', 'github_release', 'anthropics/anthropic-cookbook', 'ai-tooling',  'A', true),
+  ('modelcontextprotocol/servers',  'github_release', 'modelcontextprotocol/servers',  'ai-tooling',  'A', true),
+  ('ollama/ollama',                 'github_release', 'ollama/ollama',                 'local-llm',   'A', true),
+  ('ggerganov/llama.cpp',           'github_release', 'ggerganov/llama.cpp',           'local-llm',   'A', true),
 
   -- Hacker News (Tier A) — url is unused, type-routed in fetcher
-  ('Hacker News',       'hn',      null, 'community', 'A', false),
-  ('Show HN',           'show_hn', null, 'community', 'B', false);
+  ('Hacker News',       'hn',      null, 'community', 'A', true),
+  ('Show HN',           'show_hn', null, 'community', 'B', true);
 
 
 -- =============================================================================
