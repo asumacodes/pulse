@@ -147,25 +147,25 @@ create index fetch_runs_started_idx on fetch_runs (started_at desc);
 insert into sources (name, type, url, category, tier, enabled) values
   -- AI labs (Tier A)
   ('Anthropic News',    'rss', 'https://raw.githubusercontent.com/Olshansk/rss-feeds/refs/heads/main/feeds/feed_anthropic_news.xml',     'ai-labs', 'A', true),
-  ('OpenAI Blog',       'rss', 'https://openai.com/blog/rss.xml',            'ai-labs', 'A', false),  -- enable Day 2
-  ('Google DeepMind',   'rss', 'https://deepmind.google/blog/rss.xml',       'ai-labs', 'A', false),
-  ('Hugging Face Blog', 'rss', 'https://huggingface.co/blog/feed.xml',       'ai-labs', 'A', false),
+  ('OpenAI Blog',       'rss', 'https://openai.com/blog/rss.xml',            'ai-labs', 'A', true),  -- enable Day 2
+  ('Google DeepMind',   'rss', 'https://deepmind.google/blog/rss.xml',       'ai-labs', 'A', true),
+  ('Hugging Face Blog', 'rss', 'https://huggingface.co/blog/feed.xml',       'ai-labs', 'A', true),
 
   -- Dev / framework (Tier A)
-  ('Vercel Blog',       'rss', 'https://vercel.com/atom',                    'frontend', 'A', false),
+  ('Vercel Blog',       'rss', 'https://vercel.com/atom',                    'frontend', 'A', true),
   ('Vercel Changelog',  'rss', 'https://vercel.com/changelog/feed.xml',      'frontend', 'A', false),
-  ('Next.js Blog',      'rss', 'https://nextjs.org/feed.xml',                'frontend', 'A', false),
+  ('Next.js Blog',      'rss', 'https://nextjs.org/feed.xml',                'frontend', 'A', true),
   ('Supabase Blog',     'rss', 'https://supabase.com/feed.xml',              'backend',  'A', false),
-  ('Tailwind Blog',     'rss', 'https://tailwindcss.com/feed.xml',           'frontend', 'A', false),
+  ('Tailwind Blog',     'rss', 'https://tailwindcss.com/feeds/feed.xml',     'frontend', 'A', true),
 
   -- Design / craft (Tier B)
-  ('Figma Blog',        'rss', 'https://www.figma.com/blog/rss/',            'design',   'B', false),
+  ('Figma Blog',        'rss', 'https://figma.com/blog/feed/atom.xml',       'design',   'B', true),
   ('Linear Changelog',  'rss', 'https://linear.app/changelog/rss.xml',       'design',   'B', false),
 
   -- Builder voices (Tier B)
-  ('Simon Willison',    'rss', 'https://simonwillison.net/atom/everything/', 'builders', 'B', false),
-  ('Latent Space',      'rss', 'https://www.latent.space/feed',              'builders', 'B', false),
-  ('Interconnects',     'rss', 'https://www.interconnects.ai/feed',          'builders', 'B', false),
+  ('Simon Willison',    'rss', 'https://simonwillison.net/atom/everything/', 'builders', 'B', true),
+  ('Latent Space',      'rss', 'https://www.latent.space/feed',              'builders', 'B', true),
+  ('Interconnects',     'rss', 'https://www.interconnects.ai/feed',          'builders', 'B', true),
 
   -- GitHub Releases (Tier A) — url is the "owner/repo" identifier
   ('vercel/next.js',                'github_release', 'vercel/next.js',                'frontend',    'A', false),

@@ -13,8 +13,6 @@ export const dynamic = "force-dynamic"; // never cache
 export const maxDuration = 60; // allow time for slow feeds
 
 export async function POST(req: NextRequest) {
-  // Simple bearer-token gate. Vercel Cron sends this header automatically when
-  // CRON_SECRET is set. Local curl: pass `-H "Authorization: Bearer $CRON_SECRET"`.
   const auth = req.headers.get("authorization");
   const expected = `Bearer ${process.env.CRON_SECRET ?? ""}`;
   if (process.env.CRON_SECRET && auth !== expected) {
