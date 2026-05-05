@@ -206,3 +206,21 @@ insert into sources (name, type, url, category, tier, enabled) values
 --
 -- 6. `tags` is jsonb (not text[]) so we can grow the schema later — e.g.
 --    {tags: [...], confidence: 0.8, ...} — without a migration.
+
+
+-- -----------------------------------------------------------------------------
+-- Fuzzy title dedup function
+-- -----------------------------------------------------------------------------  
+create or replace function find_similar_title(
+  query_title text,
+  since_date timestamptz,
+  threshold float default 0.85 
+) returns table (id uuid, title text, similarity float) 
+language sql stable as $$
+  select id, title, similarity(title, query_title) as similarity
+  from items
+  where published_at >= since_date
+    and similarity(title, query_title) >= threshold
+  order by similarity desc
+  limit 1;
+$$;

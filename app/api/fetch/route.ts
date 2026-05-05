@@ -4,6 +4,8 @@ import { fetchRss } from "@/lib/sources/rss";
 import { fetchGithubReleases } from "@/lib/sources/github";
 import { fetchHn } from "@/lib/sources/hn";
 import type { FeedItem } from "@/types/feed-item";
+import { findDuplicate } from "@/lib/dedup/cross-source";
+import { scoreItem } from "@/lib/score/keywords";
 
 // POST /api/fetch
 // - Reads enabled sources from DB
@@ -123,18 +125,35 @@ export async function POST(req: NextRequest) {
 
       totalFetched += items.length;
 
-      // Insert; ON CONFLICT DO NOTHING via unique constraint
-      const rows = items.map((it) => ({
-        source_id: it.sourceId,
-        external_id: it.externalId,
-        url: it.url,
-        url_normalized: it.urlNormalized,
-        title: it.title,
-        author: it.author ?? null,
-        raw_content: it.rawContent ?? null,
-        published_at: it.publishedAt.toISOString(),
-        status: "new",
-      }));
+      const rows = [];
+      for (const it of items) {
+        const dup = await findDuplicate({
+          urlNormalized: it.urlNormalized,
+          title: it.title,
+        });
+
+        if (dup) {
+          // Skip — would create a duplicate
+          continue;
+        }
+        const { score } = scoreItem({
+          title: it.title,
+          rawContent: it.rawContent ?? "",
+        });
+
+        rows.push({
+          source_id: it.sourceId,
+          external_id: it.externalId,
+          url: it.url,
+          url_normalized: it.urlNormalized,
+          title: it.title,
+          author: it.author ?? null,
+          raw_content: it.rawContent ?? null,
+          published_at: it.publishedAt.toISOString(),
+          keyword_score: score,
+          status: "new",
+        });
+      }
 
       // Supabase upsert with ignoreDuplicates handles the conflict cleanly
       const { data: inserted, error: insertErr } = await supabase

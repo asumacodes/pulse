@@ -1,6 +1,7 @@
 import { db } from "@/lib/db/supabase";
 
-// Day 1: just prove the loop. Pretty UI is Day 6.
+// Day 3: filter to keyword_score >= 5, sort by score then recency.
+// Score badge is a debugging tool — comes off in Day 6 polish.
 // Server component, no client JS needed.
 
 export const dynamic = "force-dynamic";
@@ -13,19 +14,23 @@ type ItemRow = {
   author: string | null;
   published_at: string;
   raw_content: string | null;
+  keyword_score: number | null;
   source_id: string;
   sources: { name: string; category: string | null } | null;
 };
 
+const SCORE_THRESHOLD = 5;
+
 export default async function Page() {
   const supabase = db();
 
-  // 🚀 Day 1 FIX: no date filtering — just show latest items
   const { data, error } = await supabase
     .from("items")
     .select(
-      "id, title, url, author, published_at, raw_content, source_id, sources(name, category)",
+      "id, title, url, author, published_at, raw_content, keyword_score, source_id, sources(name, category)",
     )
+    .gte("keyword_score", SCORE_THRESHOLD)
+    .order("keyword_score", { ascending: false })
     .order("published_at", { ascending: false })
     .limit(50)
     .returns<ItemRow[]>();
@@ -54,12 +59,16 @@ export default async function Page() {
             month: "long",
             day: "numeric",
           })}{" "}
-          · {items.length} latest items
+          · {items.length} items scoring ≥ {SCORE_THRESHOLD}
         </p>
       </header>
 
       {items.length === 0 ? (
-        <p className="text-sm text-zinc-500">No items found in the database.</p>
+        <p className="text-sm text-zinc-500">
+          No items above the score threshold. Either the scorer needs tuning, or
+          the firehose was quiet today. Lower <code>SCORE_THRESHOLD</code> to
+          investigate.
+        </p>
       ) : (
         <ul className="space-y-6">
           {items.map((item) => (
@@ -76,8 +85,11 @@ export default async function Page() {
                 <time dateTime={item.published_at}>
                   {new Date(item.published_at).toLocaleString()}
                 </time>
+                <span>·</span>
+                <span className="text-zinc-400">
+                  score: {item.keyword_score ?? "—"}
+                </span>
               </div>
-
               <a
                 href={item.url}
                 target="_blank"
@@ -98,7 +110,7 @@ export default async function Page() {
       )}
 
       <footer className="mt-12 text-xs text-zinc-400">
-        Day 1 raw view · ranking + summaries arrive in Day 3–4
+        Day 3 view · keyword-scored, no LLM yet · summaries arrive in Day 4
       </footer>
     </main>
   );
