@@ -31,7 +31,7 @@ export async function findDuplicate(input: {
   const { data: titleMatch } = await supabase.rpc("find_similar_title", {
     query_title: input.title,
     since_date: since,
-    threshold: 0.85,
+    threshold: 0.97,
   });
 
   if (titleMatch && titleMatch.length > 0) {
