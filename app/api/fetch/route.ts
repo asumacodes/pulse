@@ -129,7 +129,6 @@ export async function POST(req: NextRequest) {
       for (const it of items) {
         const dup = await findDuplicate({
           urlNormalized: it.urlNormalized,
-          title: it.title,
         });
 
         if (dup) {

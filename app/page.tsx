@@ -1,9 +1,5 @@
 import { db } from "@/lib/db/supabase";
 
-// Day 3: filter to keyword_score >= 5, sort by score then recency.
-// Score badge is a debugging tool — comes off in Day 6 polish.
-// Server component, no client JS needed.
-
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -19,16 +15,23 @@ type ItemRow = {
   sources: { name: string; category: string | null } | null;
 };
 
-const SCORE_THRESHOLD = 5;
+const SCORE_THRESHOLD = 6;
+const WINDOW_HOURS = 48;
 
 export default async function Page() {
   const supabase = db();
+
+  const now = new Date();
+  const since = new Date(
+    now.getTime() - WINDOW_HOURS * 60 * 60 * 1000,
+  ).toISOString();
 
   const { data, error } = await supabase
     .from("items")
     .select(
       "id, title, url, author, published_at, raw_content, keyword_score, source_id, sources(name, category)",
     )
+    .gte("published_at", since)
     .gte("keyword_score", SCORE_THRESHOLD)
     .order("keyword_score", { ascending: false })
     .order("published_at", { ascending: false })
