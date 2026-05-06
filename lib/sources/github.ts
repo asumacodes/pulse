@@ -36,6 +36,14 @@ function shouldSkipRelease(rel: {
   // Pre-release suffixes: -rc1, -beta.2, -alpha, -dev, -canary.40
   if (/-(rc|beta|alpha|dev|canary)(\.|-|\d|$)/.test(tag)) return true;
 
+  // Monorepo patch releases — these are CI artifacts of dependency bumps,
+  // not human-meaningful releases. Real feature releases come through the
+  // blog, HN, or as top-level versioned tags. Examples we want to drop:
+  // "@ai-sdk/rsc@1.0.185", "@ai-sdk/vercel@2.0.46"
+  // Examples we want to KEEP:
+  // "ai@5.0.0", "shadcn@4.7.0", "v2.0.0", "next@15.0.0"
+  if (/^@[\w-]+\/[\w-]+@\d+\.\d+\.\d+$/.test(rel.tag_name)) return true;
+
   return false;
 }
 

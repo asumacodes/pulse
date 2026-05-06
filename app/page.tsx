@@ -11,6 +11,11 @@ type ItemRow = {
   published_at: string;
   raw_content: string | null;
   keyword_score: number | null;
+  llm_score: number | null;
+  final_score: number | null;
+  summary: string | null;
+  why_it_matters: string | null;
+  action: string | null;
   source_id: string;
   sources: { name: string; category: string | null } | null;
 };
@@ -29,11 +34,10 @@ export default async function Page() {
   const { data, error } = await supabase
     .from("items")
     .select(
-      "id, title, url, author, published_at, raw_content, keyword_score, source_id, sources(name, category)",
+      "id, title, url, author, published_at, raw_content, keyword_score, llm_score, final_score, summary, why_it_matters, action, source_id, sources(name, category)",
     )
-    .gte("published_at", since)
-    .gte("keyword_score", SCORE_THRESHOLD)
-    .order("keyword_score", { ascending: false })
+    .gte("final_score", SCORE_THRESHOLD)
+    .order("final_score", { ascending: false })
     .order("published_at", { ascending: false })
     .limit(50)
     .returns<ItemRow[]>();
@@ -90,7 +94,15 @@ export default async function Page() {
                 </time>
                 <span>·</span>
                 <span className="text-zinc-400">
-                  score: {item.keyword_score ?? "—"}
+                  score: {item.final_score}
+                  {item.llm_score !== null &&
+                    item.keyword_score !== null &&
+                    item.llm_score !== item.keyword_score && (
+                      <span className="text-zinc-300">
+                        {" "}
+                        (kw {item.keyword_score} / llm {item.llm_score})
+                      </span>
+                    )}
                 </span>
               </div>
               <a
@@ -102,10 +114,26 @@ export default async function Page() {
                 {item.title}
               </a>
 
-              {item.raw_content && (
-                <p className="mt-2 line-clamp-3 text-sm text-zinc-600">
-                  {item.raw_content}
-                </p>
+              {item.summary ? (
+                <div className="mt-2 space-y-1">
+                  <p className="text-sm text-zinc-700">{item.summary}</p>
+                  {item.why_it_matters && (
+                    <p className="text-sm italic text-zinc-500">
+                      Why it matters: {item.why_it_matters}
+                    </p>
+                  )}
+                  {item.action && (
+                    <p className="text-sm font-medium text-zinc-800">
+                      → {item.action}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                item.raw_content && (
+                  <p className="mt-2 line-clamp-3 text-sm text-zinc-600">
+                    {item.raw_content}
+                  </p>
+                )
               )}
             </li>
           ))}
